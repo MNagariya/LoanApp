@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <style>
+       
+    </style>
+</head>
+<body>
+    <form id="signupForm">
+        <h2>Create New Account</h2>
+        <label for="signupUsername">Username:</label>
+        <input type="text" id="signupUsername" name="signupUsername" required>
+
+        <label for="signupPassword">Password:</label>
+        <input type="password" id="signupPassword" name="signupPassword" required>
+
+        <label>User Type:</label>
+        <label>
+            <input type="radio" name="userType" value="customer" checked> Customer
+        </label>
+        <label>
+            <input type="radio" name="userType" value="admin"> Admin
+        </label>
+
+        <button type="button" onclick="submitSignupForm()">SignUp</button>
+    </form>
+
+    <script>
+        function submitSignupForm() {
+            const formData = {
+                username: document.getElementById('signupUsername').value,
+                password: document.getElementById('signupPassword').value,
+                usertype: document.querySelector('input[name="userType"]:checked').value,
+            };
+
+            fetch('/user/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.href = '/login';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+            });
+        }
+    </script>
+</body>
+</html>

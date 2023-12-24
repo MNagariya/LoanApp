@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Loan</title>
+    <style>
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 20%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Loan</h1>
+    <form id="loanForm">
+        <label for="amount" style="margin-right: 35px; ">Amount:</label>
+        <input type="text" id="amount" name="amount" style="margin-bottom: 10px;" required><br>
+
+        <label for="term">Term (weeks):</label>
+        <input type="text" id="term" name="term" style="margin-bottom: 10px;" required><br>
+
+        <button type="button" onclick="submitLoanForm()">Submit</button>
+    </form>
+
+    <script>
+        function submitLoanForm() {
+            
+            const formData = {
+                amount: document.getElementById('amount').value,
+                term: document.getElementById('term').value,
+                
+            };
+            const accessToken = localStorage.getItem('access_token');
+            
+            fetch('/loan/create', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message)
+                window.location.href = '/my_loans';
+                
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+            });
+        }
+    </script>
+
+</body>
+</html>

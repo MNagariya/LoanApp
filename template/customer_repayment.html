@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Repayment</title>
+</head>
+<body>
+    <h1>Add Repayment</h1>
+    <form action="/api/customers/{{ user_id }}/loans/{{ loan_id }}/repayments" method="post">
+        <label for="amount_paid">Amount Paid:</label>
+        <input type="text" id="amount_paid" name="amount_paid" required><br>
+
+        <button type="submit">Submit Repayment</button>
+    </form>
+</body>
+</html>
