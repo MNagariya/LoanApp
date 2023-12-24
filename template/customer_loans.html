@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Loans</title>
+    <style>
+        button {
+            background-color: green;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 20%;
+        }
+    </style>
+</head>
+<body style="background-color: rgb(208, 136, 185);">
+    <h1 style="display: inline-block; margin-right: 600px; color:black;">My Loans</h1> 
+    <button type="button" onclick="createLoan()" style="display: inline-block; margin-right: 50px;"> Apply loan </button>
+    <button type="button" onclick="logOut()"> Logout </button>
+    <table border="1">
+        <thead>
+            <tr style="background-color: rgb(163, 163, 230);">
+                <th>Loan ID</th>
+                <th>Amount</th>
+                <th>Term (weeks)</th>
+                <th>Status</th>
+                <th>Action</th>
+                <th>Repayments</th>
+            </tr>
+        </thead>
+        <tbody id="loansTableBody">
+            
+        </tbody>
+    </table>
+
+    <dialog id="paymentDialog" class="popup">
+        <label for="paymentAmountPopup">Enter Payment Amount:</label>
+        <input type="text" id="paymentAmountPopup" name="paymentAmountPopup" required>
+        <button type="button" onclick="submitPaymentPopup()">Submit Payment</button>
+        <button type="button" onclick="closePaymentPopup()">Cancel</button>
+    </dialog>
+
+
+    <script>
+        
+        const accessToken = localStorage.getItem('access_token');
+
+        
+        function fetchLoans() {
+            fetch('/user/loans', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const loansTableBody = document.getElementById('loansTableBody');
+
+                
+                loansTableBody.innerHTML = '';
+
+                
+                data.loans.forEach(loan => {
+                    const row = loansTableBody.insertRow();
+
+                    row.insertCell(0).textContent = loan.loan_id;
+                    row.insertCell(1).textContent = loan.amount;
+                    row.insertCell(2).textContent = loan.term;
+                    row.insertCell(3).textContent = loan.status;
+
+                    const actionCell = row.insertCell(4);
+                    if (loan.status === 'APPROVED') {
+                        actionCell.innerHTML = `<button type="button" style="width:100%;" onclick="showPaymentDialog(${loan.loan_id})">Make Payment</button>`;
+                    } else {
+                        actionCell.textContent = '-';
+                    }
+
+                    const repaymentsCell = row.insertCell(5);
+                    repaymentsCell.innerHTML = '<ul>' +
+                        loan.repayments.map(repayment =>
+                            `<li>Amount: ${repayment.amount}, Due Date: ${repayment.due_date}, Status: ${repayment.status}</li>`
+                        ).join('') +
+                        '</ul>';
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+            });
+        }
+
+        
+        function showPaymentDialog(loanId) {
+            const paymentDialog = document.getElementById('paymentDialog');
+            const paymentAmountInput = document.getElementById('paymentAmountPopup');
+
+            
+            paymentAmountInput.value = '';
+            paymentAmountInput.dataset.loanId = loanId;
+
+            
+            paymentDialog.showModal();
+        }
+
+        function submitPaymentPopup() {
+            const paymentAmountInput = document.getElementById('paymentAmountPopup');
+            const loanId = paymentAmountInput.dataset.loanId;
+            const paymentAmount = parseFloat(paymentAmountInput.value);
+
+            
+            if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                alert('Please enter a valid payment amount.');
+                return;
+            }
+
+            
+            fetch(`/loan/${loanId}/repayments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ amount_paid: paymentAmount })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error)
+                }
+                else {
+                alert(data.message);
+                }
+                
+                location.reload() 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+            })
+            .finally(() => {
+                
+                closePayment})}
+
+        function createLoan() {
+            window.location.href = '/create_loan';
+        }
+
+        function closePaymentPopup() {
+            const paymentDialog = document.getElementById('paymentDialog');
+            paymentDialog.close();
+        }
+
+        function logOut() {
+            localStorage.setItem('access_token', null)
+            window.location.href = '/login';
+        }
+
+        
+        window.onload = fetchLoans;
+    </script>
+</body>
+</html>
