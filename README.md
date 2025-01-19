@@ -1,4 +1,4 @@
-#This is The loan app created by Mayank Nagariya.
+#This is a loan app created by Mayank Nagariya.
 
 Tech stack used-
 1. Backend- Flask (choosen flask because it's very lightweight and gives us flexibility to choose other things)
